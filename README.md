@@ -7,7 +7,7 @@ MOsaic structural Variants ANonation in cAncer is a pipeline for identifying mos
 ## Workflow 
 ![17B195E0-10F4-45B8-9F95-8EB99F8BBC56_1_201_a](https://github.com/user-attachments/assets/0a23cc97-28a1-470e-b572-0211579c35d4)
 
-## Roles (future Hackaton team):
+## Roles
 
 *Dmitrii - get the dataset
 
