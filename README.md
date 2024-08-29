@@ -23,3 +23,10 @@ Mosaic SV calls in VCF (based on VAF) --> identify affected genes --> annotate t
 *Franceso, Gobi - integrate VEP/other gene function DB into the pipeline for annotation? 
 
 *Gil - write the paper 
+
+## Filtration
+
+- we will filter the VCF data file, based on AF (Allele frequency) < 0.4, VCF contains three types of structural variations (inversions, duplications and deletions)
+- create shell script for filtering, in this step we used "bcftools" tool for filtration that takes three arguments (input.vcf, output.vcf, AF threshold)
+- save shell script in the same directory of the input.vcf data to run command line for filtration './filter_vcf.sh input.vcf filtered_output.vcf' (this includes: shell script, input data file, resulted file)
+
