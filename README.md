@@ -5,14 +5,7 @@ MOsaic structural Variants ANonation in cAncer is a pipeline for identifying mos
 
 
 ## Workflow 
-
-Mosaic SV calls in VCF (based on VAF) --> identify affected genes --> annotate the functional effect, e.g. deletion - downregulation, amplification - upregulation --> outline selective advantages of mosaic SVs knowing their implications in cancer 
-
-- ''SnpEff'', ''ANNOVAR'', or ''VEP''  to annotate structural variants
-- ''KEGG'', ''Reactome'', or ''Gene Ontology (GO)'' to find associations between genes and known biological pathways?
-- Integrating epigenomic data?
-- Compare the integrated epigenomic data with normal data (human genome) to see the variations 
-- Visualise our results in heatmaps/ plots 
+![17B195E0-10F4-45B8-9F95-8EB99F8BBC56_1_201_a](https://github.com/user-attachments/assets/0a23cc97-28a1-470e-b572-0211579c35d4)
 
 ## Roles (future Hackaton team):
 
@@ -29,4 +22,3 @@ Mosaic SV calls in VCF (based on VAF) --> identify affected genes --> annotate t
 - we will filter the VCF data file, based on AF (Allele frequency) < 0.4, VCF contains three types of structural variations (inversions, duplications and deletions)
 - create shell script for filtering, in this step we used "bcftools" tool for filtration that takes three arguments (input.vcf, output.vcf, AF threshold)
 - save shell script in the same directory of the input.vcf data to run command line for filtration './filter_vcf.sh input.vcf filtered_output.vcf' (this includes: shell script, input data file, resulted file)
-
