@@ -18,9 +18,9 @@ Mosaic SV calls in VCF (based on VAF) --> identify affected genes --> annotate t
 
 *Dmitrii - get the dataset
 
-*Farha - identify mosaic SVs and affected genes? 
+*Farha - identify mosaic SVs and affected genes
 
-*Franceso, Gobi - integrate VEP/other gene function DB into the pipeline for annotation? 
+*Gobi - integrate gene function DB into the pipeline for annotation
 
 *Gil - write the paper 
 
