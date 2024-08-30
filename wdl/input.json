@@ -1,0 +1,6 @@
+{
+	"MoVana_Workflow.vcf_file" : "../files/icgc_filtered_sorted.vcf"
+        "MoVana_Workflow.af" : "0.4",
+        "MoVana_Workflow.bed_file" : "../files/genes_cds_only.bed",
+        "MoVana_Workflow.sv_type" : "DEL"
+}
