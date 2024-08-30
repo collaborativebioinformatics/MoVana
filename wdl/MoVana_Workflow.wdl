@@ -141,6 +141,76 @@ task FilterVCF {
 
   runtime {
     docker: "bcftools:latest"
+    cpu : 1
+    memory : "4 GiB"
+    maxRetries : 1
+  }
+}
+
+# Task 3: Random sampling
+task RandomSampling {
+  input {
+    File input_vcf
+    File output_vcf_sampled
+  }
+
+  command <<<
+    python3 <<CODE
+import random
+
+input_vcf = '{input_vcf}'
+output_vcf_sampled = '{output_vcf_sampled}'
+
+data_lines = []
+
+with open(input_vcf, 'r') as infile:
+    with open(output_vcf_sampled, 'w') as outfile:
+        for line in infile:
+            if line.startswith('#'):
+                outfile.write(line)
+            else:
+                data_lines.append(line.strip())
+
+sampled_lines = random.sample(data_lines, min(1000, len(data_lines)))
+
+with open(output_vcf_sampled, 'a') as outfile:
+    for line in sampled_lines:
+        outfile.write(line + '\n')
+
+print(f"VCF file '{output_vcf_sampled}' containing 1000 randomly sampled rows has been created.")
+CODE
+  >>>
+
+  output {
+    File sampled_vcf = "${output_vcf_sampled}"
+  }
+
+  runtime {
+    docker: "python:3.8"
+    cpu : 1
+    memory : "4 GiB"
+    maxRetries : 1
+  }
+}
+
+# Task 4: Intersect SV positions with genes
+task IntersectSV {
+  input {
+    File input_file
+    File output_file
+    File bed_file
+  }
+
+  command <<<
+    bedtools intersect -a "${input_file}" -b "${bed_file}" -wo > "${output_file}"
+  >>>
+
+  output {
+    File intersected_file = "${output_file}"
+  }
+
+  runtime {
+    docker: "biocontainers/bedtools:latest"
   }
 }
 
@@ -162,6 +232,18 @@ workflow MoVana_Workflow {
       af = af,
       input_file = GenerateSimulatedDistribution.updated_vcf,
       output_file = "filtered_icgc_with_SVLEN.vcf"
+  }
+  call RandomSampling {
+    input:
+      input_vcf = FilterVCF.filtered_vcf,
+      output_vcf_sampled = "filtered_icgc_with_SVLEN2_sampled.vcf"
+  }
+
+  call IntersectSV {
+    input:
+      input_file = RandomSampling.sampled_vcf,
+      output_file = "icgc_with_genes.txt",
+      bed_file = bed_file
   }
 
   output {
