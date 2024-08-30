@@ -25,4 +25,5 @@ Next known SVs breakpoints and gene coordinates are used to find overlaps with b
 *Identifying recurrent mosaic events impilcated in treatment resistance 
 
 ## Test data
-Test data is located in the files and was downloaded from the ICGC bucket available at AWS s3://icgc25k-open/PCAWG/consensus_sv/final_consensus_sv_bedpe_passonly.icgc.public.tgz. It includes deletions, duplications and inversions. The calls were assigned simulated AF values and filtered with the threshold of 0.4 VAF.
+Test data is located in the files and was downloaded from the ICGC bucket available at AWS 
+s3://icgc25k-open/PCAWG/consensus_sv/final_consensus_sv_bedpe_passonly.icgc.public.tgz. It includes deletions, duplications and inversions. The calls were assigned simulated AF values and filtered with the threshold of 0.4 VAF.
