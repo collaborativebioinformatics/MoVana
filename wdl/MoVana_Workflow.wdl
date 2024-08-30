@@ -1,7 +1,7 @@
 version 1.0
 
 # Task 1: Generate a Simulated Distribution of allele frequencies and modify VCF file
-task GenerateSimulatedDistribution {
+task Step1_GenerateSimulatedDistribution {
   input {
     File vcf_file
   }
@@ -124,7 +124,7 @@ CODE
 }
 
 # Task 2: Filter VCF using VAF
-task FilterVCF {
+task Step2_FilterVCF {
   input {
     String af
     File input_file
@@ -148,7 +148,7 @@ task FilterVCF {
 }
 
 # Task 3: Random sampling
-task RandomSampling {
+task Step3_RandomSampling {
   input {
     File input_vcf
     File output_vcf_sampled
@@ -194,7 +194,7 @@ CODE
 }
 
 # Task 4: Intersect SV positions with genes
-task IntersectSV {
+task Step4_IntersectSV {
   input {
     File input_file
     File output_file
@@ -211,6 +211,132 @@ task IntersectSV {
 
   runtime {
     docker: "biocontainers/bedtools:latest"
+    cpu : 1
+    memory : "4 GiB"
+    maxRetries : 1
+  }
+}
+
+# Task 5: Get genes for GSEA
+task Step5_GetGenesForGSEA {
+  input {
+    String sv_type
+    File input_file
+    File output_file
+  }
+
+  command <<<
+    bash <<SCRIPT
+#!/bin/bash
+# Function to print usage
+usage() {
+  echo "Usage: $0 -type [DEL|DUP|all] -i input_file -o output_file"
+  exit 1
+}
+
+# Initialize variables
+sv_type="${sv_type}"
+input_file="${input_file}"
+output_file="${output_file}"
+
+# Validate the sv_type
+if [[ "${sv_type}" != "DEL" && "${sv_type}" != "DUP" && "${sv_type}" != "all" ]]; then
+  usage
+fi
+
+# Validate input and output files
+if [ -z "${input_file}" ] || [ -z "${output_file}" ]; then
+  usage
+fi
+
+# Extract unique gene IDs based on SV type and remove .x suffix
+if [ "${sv_type}" == "all" ]; then
+  awk -F'\t' '{for (i=1; i<=NF; i++) if ($i ~ /gene_name /) {match($i, /gene_name "([^"]+)"/, arr); p
+rint arr[1]}}' "${input_file}" | sed 's/\.[0-9]\+$//' | sort | uniq > "${output_file}"
+else
+  grep "SVTYPE=${sv_type}" "${input_file}" | awk -F'\t' '{for (i=1; i<=NF; i++) if ($i ~ /gene_name /
+) {match($i, /gene_name "([^"]+)"/, arr); print arr[1]}}' | sed 's/\.[0-9]\+$//' | sort | uniq > "${o
+utput_file}"
+fi
+# Notify the user
+echo "Unique gene names for SV type ${sv_type} have been written to ${output_file}"
+SCRIPT
+  >>>
+
+  output {
+    File gene_list = "${output_file}"
+  }
+
+  runtime {
+    docker: "bash:latest"
+    cpu : 1
+    memory : "4 GiB"
+    maxRetries : 1
+  }
+}
+
+# Task 6: Perform GSEA
+task Step6_PerformGSEA {
+  input {
+    File gene_list_file
+  }
+
+  command <<<
+    python3 <<CODE
+import gseapy as gp
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Load your list of Ensembl gene IDs that were produced by a bash script
+# Assuming your gene IDs are in a text file, one per line
+gene_list_file = '{gene_list_file}'
+with open(gene_list_file) as f:
+    gene_list = [line.strip() for line in f]
+
+# Convert the list to a pandas DataFrame
+genes_df = pd.DataFrame(gene_list, columns=['gene_id'])
+
+# Perform Gene Set Enrichment Analysis using gseapy
+# You can choose the library you want to use for enrichment, e.g., "KEGG_2019_Human"
+enrichment_results = gp.enrichr(gene_list=genes_df['gene_id'].tolist(),
+                                gene_sets='KEGG_2019_Human',
+                                organism='Human',  # specify the organism, it can be 'Human', 'Mouse'
+, etc.
+                                outdir='/g/korbel/olisov/hackathon/enrichment_results',  # the output
+ directory
+                                cutoff=0.05)
+
+# Extract the results DataFrame
+results_df = enrichment_results.results
+
+# Extract the number of genes from the 'Overlap' column
+results_df['Num_Genes'] = results_df['Overlap'].apply(lambda x: int(x.split('/')[0]))
+
+# Plot 1: Barplot with number of genes on x-axis and Adjusted P-value as color
+plt.figure(figsize=(8, 6))
+sns.barplot(
+    x='Num_Genes',
+    y='Term',
+    data=results_df.head(10),
+    dodge=False,
+    palette="coolwarm",
+    hue='Adjusted P-value'
+)
+plt.title('Top Enriched Terms')
+plt.xlabel('Number of Genes')
+plt.legend(title='Adjusted P-value')
+plt.savefig(f'GSEA.png', bbox_inches='tight', dpi=300)
+plt.show()
+CODE
+  >>>
+
+  output {
+    File gsea_plot = "GSEA.png"
+  }
+
+  runtime {
+    docker: "python:3.8"
   }
 }
 
@@ -222,34 +348,50 @@ workflow MoVana_Workflow {
     String sv_type
   }
 
-  call GenerateSimulatedDistribution {
+  call Step1_GenerateSimulatedDistribution {
     input:
       vcf_file = vcf_file
   }
 
-  call FilterVCF {
+  call Step2_FilterVCF {
     input:
       af = af,
-      input_file = GenerateSimulatedDistribution.updated_vcf,
+      input_file = Step1_GenerateSimulatedDistribution.updated_vcf,
       output_file = "filtered_icgc_with_SVLEN.vcf"
   }
-  call RandomSampling {
+
+  call Step3_RandomSampling {
     input:
-      input_vcf = FilterVCF.filtered_vcf,
+      input_vcf = Step2_FilterVCF.filtered_vcf,
       output_vcf_sampled = "filtered_icgc_with_SVLEN2_sampled.vcf"
   }
 
-  call IntersectSV {
+  call Step4_IntersectSV {
     input:
-      input_file = RandomSampling.sampled_vcf,
+      input_file = Step3_RandomSampling.sampled_vcf,
       output_file = "icgc_with_genes.txt",
       bed_file = bed_file
   }
+  call Step5_GetGenesForGSEA {
+    input:
+      sv_type = sv_type,
+      input_file = Step4_IntersectSV.intersected_file,
+      output_file = "genes_for_GSEA.txt"
+  }
+
+  call Step6_PerformGSEA {
+    input:
+      gene_list_file = Step5_GetGenesForGSEA.gene_list
+  }
 
   output {
-    File updated_vcf = GenerateSimulatedDistribution.updated_vcf
-    File plot = GenerateSimulatedDistribution.plot
-    File filtered_vcf = FilterVCF.filtered_vcf
+    File updated_vcf = Step1_GenerateSimulatedDistribution.updated_vcf
+    File plot = Step1_GenerateSimulatedDistribution.plot
+    File filtered_vcf = Step2_FilterVCF.filtered_vcf
+    File sampled_vcf = Step3_RandomSampling.sampled_vcf
+    File intersected_file = Step4_IntersectSV.intersected_file
+    File gene_list = Step5_GetGenesForGSEA.gene_list
+    File gsea_plot = Step6_PerformGSEA.gsea_plot
   }
 }
 
