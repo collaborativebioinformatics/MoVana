@@ -21,8 +21,8 @@ Next, known SV breakpoints and gene coordinates are used to find overlaps with b
 
 ## Future directions
 *Comparing the composition and frequency of mosaic SVs in primary tumors vs metastasis and relapse
-
 *Identifying recurrent mosaic events implicated in treatment resistance 
+*Integration of ClinVar/dbVar/oncoKB data into the pipeline to obtain comprehemsive information regarding a specific gene or allele and its overall implication within tumor progression and proliferation
 
 ## Test data
 Test data is located in the files and was downloaded from the ICGC bucket available at AWS 
