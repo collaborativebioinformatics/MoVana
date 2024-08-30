@@ -1,4 +1,4 @@
-# MoVana 
+# MoVana
 **MO**saic structural **V**ariants **AN**nonation in c**A**ncer is a pipeline for identifying mosaic DNA rearrangements in the call set and linking them to functional impact.
 
 ## Background
@@ -16,19 +16,23 @@ Next known SVs breakpoints and gene coordinates are used to find overlaps with b
 ![GSEA](https://github.com/user-attachments/assets/cae8f075-046b-4e60-9ab4-f1874b3a3469)
 
 ## Installation
-### docker 
-docker build -t dockerfile .
-docker run dockerfile
 
 ### make sure you have python and bash is installed
-'pip install numpy pandas matplotlib'
+    pip install numpy pandas matplotlib
+
+### docker 
+    docker build -t dockerfile .
+    docker run dockerfile
 
 ## Usage
-
+### cromwell
+    java -jar _Dconfig.file="cromwell.conf" -i wdl/input.json wdl/MoVana_Workflow.wdl
+*For installation of cromwell, please follow this guide "https://github.com/broadinstitute/cromwell"*
+    
 ## Future directions
-*Comparing the composition and frequency of mosaic SVs in primary tumors vs metastasis and relapse
-*Identifying recurrent mosaic events impilcated in treatment resistance to further accelerate biomarker dicovery and treatment efficiency
-*Integration of ClinVar/dbVar/OncoKB data into the pipeline to obtain more comprehensive information regarding a specific gene/allele and its overall implication in tumor growth and progression
+* Comparing the composition and frequency of mosaic SVs in primary tumors vs metastasis and relapse.
+* Identifying recurrent mosaic events impilcated in treatment resistance to further accelerate biomarker dicovery and treatment efficiency.
+* Integration of ClinVar/dbVar/OncoKB data into the pipeline to obtain more comprehensive information regarding a specific gene/allele and predict its overall implication in tumor growth and progression.
 
 ## Test data
 Test data is located in the files and was downloaded from the ICGC bucket available at AWS 
