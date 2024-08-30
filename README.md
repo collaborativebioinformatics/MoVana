@@ -1,5 +1,5 @@
 # MoVana 
-MOsaic structural Variants ANnonation in cAncer is a pipeline for identifying mosaic DNA rearrangements in the call set and linking them to functional impact.
+**MO**saic structural **V**ariants **AN**nonation in c**A**ncer is a pipeline for identifying mosaic DNA rearrangements in the call set and linking them to functional impact.
 
 ## Background
 Cancer is a highly heterogeneous system that arises from healthy cells by a series of point mutations and large DNA rearrangements. Sporadic mutagenesis gives rise to tumor subclones that have a distinct set of genomic alterations, which can promote tumor growth, metastasis or treatment resistance. In comparison to single nucleotide variants, characterisation of more complex events that contribute to intratumoral genetic heterogeneity was lacking up until recent efforts in deep whole genome sequencing of tumors and development of mutation callers. In this project we specifically focus on mosaic structural variants in cancer and have designed a tool for their functional annotation by identifying which genes and biological pathways are affected by these mosaic structural variants.  While simple, this tool should become a stepping stone for further studies on the contribution of rare variants to emergence of treatment-resistant subclones and the recurrence of disease.
