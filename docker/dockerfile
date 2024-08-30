@@ -1,0 +1,14 @@
+FROM python:3.8
+
+# Install required Python libraries
+RUN pip install numpy pandas matplotlib
+
+# Set the working directory
+WORKDIR /workspace
+
+# Copy the WDL script into the container
+COPY . /workspace
+
+# Set the entry point
+ENTRYPOINT ["python3"]
+

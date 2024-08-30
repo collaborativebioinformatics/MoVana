@@ -123,6 +123,27 @@ CODE
   }
 }
 
+# Task 2: Filter VCF using VAF
+task FilterVCF {
+  input {
+    String af
+    File input_file
+    File output_file
+  }
+
+  command <<<
+    bcftools view -i "INFO/AF<${af}" "${input_file}" -o "${output_file}"
+  >>>
+
+  output {
+    File filtered_vcf = "${output_file}"
+  }
+
+  runtime {
+    docker: "bcftools:latest"
+  }
+}
+
 workflow MoVana_Workflow {
   input {
     File vcf_file
@@ -136,9 +157,17 @@ workflow MoVana_Workflow {
       vcf_file = vcf_file
   }
 
+  call FilterVCF {
+    input:
+      af = af,
+      input_file = GenerateSimulatedDistribution.updated_vcf,
+      output_file = "filtered_icgc_with_SVLEN.vcf"
+  }
+
   output {
     File updated_vcf = GenerateSimulatedDistribution.updated_vcf
     File plot = GenerateSimulatedDistribution.plot
+    File filtered_vcf = FilterVCF.filtered_vcf
   }
 }
 
