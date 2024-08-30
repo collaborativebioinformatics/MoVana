@@ -1,5 +1,5 @@
 # MoVana 
-MOsaic structural Variants ANonation in cAncer is a pipeline for identifying mosaic DNA rearrangements in the call set and linking them to functional impact.
+MOsaic structural Variants ANnonation in cAncer is a pipeline for identifying mosaic DNA rearrangements in the call set and linking them to functional impact.
 
 ## Background
 
