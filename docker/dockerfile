@@ -1,8 +1,9 @@
-FROM python:3.8
+FROM python:3.14
 
 # Install required Python libraries
 RUN pip install numpy pandas matplotlib
 
+COPY . .
 # Set the working directory
 WORKDIR /workspace
 
@@ -11,4 +12,3 @@ COPY . /workspace
 
 # Set the entry point
 ENTRYPOINT ["python3"]
-
