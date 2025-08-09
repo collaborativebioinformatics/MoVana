@@ -26,7 +26,7 @@ Next known SVs breakpoints and gene coordinates are used to find overlaps with b
 
 ## Usage
 ### cromwell
-    java -jar cromwell-90.jar run -Dconfig.file="cromwell.conf" -i wdl/input.json wdl/MoVana_Workflow.wdl
+    java -Dconfig.file="cromwell.conf" -jar cromwell-90.jar run -i wdl/input.json wdl/MoVana_Workflow.wdl
 *For installation of cromwell, please follow this guide "https://github.com/broadinstitute/cromwell"*
     
 ## Future directions
