@@ -1,4 +1,4 @@
-name: MoVana CI
+name: movana CI
 
 on:
   push:
