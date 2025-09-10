@@ -43,13 +43,13 @@ plt.ylabel('Density')
 # Adding the legend
 plt.legend()
 
-plt.savefig(f'/g/korbel/olisov/hackathon/ICGC_VAF_distribution.png', bbox_inches='tight', dpi=300)
+plt.savefig(f'../files/ICGC_VAF_distribution.png', bbox_inches='tight', dpi=300)
 
 # Show the plot
 plt.show()
 
 #Read the VCF file and add AF values
-vcf_file_path = '/g/korbel/olisov/hackathon/icgc_filtered_sorted.vcf'
+vcf_file_path = '../files/icgc_filtered_sorted.vcf'
 vcf_data = pd.read_csv(vcf_file_path, sep='\t', comment='#', header=None)
 
 # Find the header line and set the column names
@@ -68,7 +68,7 @@ af_values = np.random.choice(af_distribution, size=len(vcf_data))
 vcf_data['INFO'] = vcf_data['INFO'] + ';AF=' + af_values.astype(str)
 
 # Define the output file path
-output_vcf_path = '/g/korbel/olisov/hackathon/icgc_with_af.vcf'
+output_vcf_path = '../files/icgc_with_af.vcf'
 
 # Write the updated VCF to a new file, preserving the header
 with open(output_vcf_path, 'w') as out_file:
@@ -86,8 +86,8 @@ print(f"VCF file with AF values saved to: {output_vcf_path}")
 
 #add SVLEN for clinical_SVs
 # File paths
-input_vcf = '/g/korbel/olisov/hackathon/icgc_with_af.vcf'
-output_vcf = '/g/korbel/olisov/hackathon/icgc_with_af_with_SVLEN.vcf'
+input_vcf = '../files/icgc_with_af.vcf'
+output_vcf = '../files/icgc_with_af_with_SVLEN.vcf'
 
 def add_svlen_to_info(info, pos):
     # Parse the existing INFO field

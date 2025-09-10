@@ -2,8 +2,8 @@
 #thi script filters the vcf file to obtain events with below specific VAF (mosaic)
 # Default values
 AF="0.4"
-INPUT_FILE="icgc_with_af_with_SVLEN.vcf"
-OUTPUT_FILE="filtered_icgc_with_SVLEN.vcf"
+INPUT_FILE="../files/icgc_with_af_with_SVLEN.vcf"
+OUTPUT_FILE="../files/filtered_icgc_with_SVLEN.vcf"
 
 # Function to display usage information
 usage() {

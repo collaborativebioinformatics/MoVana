@@ -2,8 +2,8 @@ import random
 import pandas as pd
 
 # File paths
-input_vcf = '/g/korbel/olisov/hackathon/filtered_icgc_with_SVLEN.vcf'
-output_vcf_sampled = '/g/korbel/olisov/hackathon/filtered_icgc_with_SVLEN2_sampled.vcf'
+input_vcf = '../files/filtered_icgc_with_SVLEN.vcf'
+output_vcf_sampled = '../files/filtered_icgc_with_SVLEN2_sampled.vcf'
 
 # Initialize list to store data lines
 data_lines = []

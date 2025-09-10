@@ -2,9 +2,9 @@
 #this script intersects the SV positions with genes
 
 # Default values
-INPUT_FILE="filtered_icgc_with_SVLEN2_sampled.vcf"
-OUTPUT_FILE="icgc_with_genes.txt"
-BED_FILE="genes_cds_only.bed"
+INPUT_FILE="../files/filtered_icgc_with_SVLEN2_sampled.vcf"
+OUTPUT_FILE="../files/icgc_with_genes.txt"
+BED_FILE="../files/genes_cds_only.bed"
 
 # Function to display usage information
 usage() {
