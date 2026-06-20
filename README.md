@@ -35,5 +35,6 @@ Next known SVs breakpoints and gene coordinates are used to find overlaps with b
 * Integration of ClinVar/dbVar/OncoKB data into the pipeline to obtain more comprehensive information regarding a specific gene/allele and predict its overall implication in tumor growth and progression.
 
 ## Test data
-Test data is located in the files and was downloaded from the ICGC bucket available at AWS 
-s3://icgc25k-open/PCAWG/consensus_sv/final_consensus_sv_bedpe_passonly.icgc.public.tgz. It includes deletions, duplications and inversions. The calls were assigned simulated AF values and filtered with the threshold of 0.4 VAF.
+Test data is located in the files and was downloaded from the [ICGC PCAWG consensus structural variant call set](https://dcc.icgc.org/api/v1/download?fn=/PCAWG/consensus_sv/final_consensus_sv_bedpe_passonly.icgc.public.tgz), available at AWS s3://icgc25k-open/PCAWG/consensus_sv/final_consensus_sv_bedpe_passonly.icgc.public.tgz. It includes deletions, duplications and inversions. The calls were assigned simulated AF values and filtered with the threshold of 0.4 VAF.
+
+*Note: the ICGC Data Portal retired in June 2024. The same open-access bucket is now reachable via the [ICGC ARGO legacy data docs](https://docs.icgc-argo.org/docs/data-access/icgc-25k-data) at `https://object.genomeinformatics.org` (bucket `icgc25k-open`).*

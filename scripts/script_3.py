@@ -1,5 +1,4 @@
 import random
-import pandas as pd
 
 # File paths
 input_vcf = '../files/filtered_icgc_with_SVLEN.vcf'

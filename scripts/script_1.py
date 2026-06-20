@@ -91,12 +91,14 @@ output_vcf = '../files/icgc_with_af_with_SVLEN.vcf'
 
 def add_svlen_to_info(info, pos):
     # Parse the existing INFO field
-    info_dict = dict(item.split("=") for item in info.split(";") if "=" in item)
-    
+    info_dict = dict(item.split("=", 1) for item in info.split(";") if "=" in item)
+
     # Calculate SVLEN
     end = int(info_dict['END'])
     svlen = end - int(pos)
-    
+    if info_dict.get('SVTYPE') == 'DEL':
+        svlen = -svlen
+
     # Add SVLEN to the INFO field
     info_dict['SVLEN'] = str(svlen)
     
@@ -130,7 +132,7 @@ with open(input_vcf, 'r') as infile, open(output_vcf, 'w') as outfile:
         columns[7] = updated_info
         
         # Change GT in the FORMAT and SAMPLE columns
-        if format_col == "GT":
+        if format_col.split(':')[0] == "GT":
             columns[9] = "0/1"
         
         # Write the updated line to the output VCF

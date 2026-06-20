@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 # Load your list of Ensembl gene IDs that were produced by a bash script 
 # Assuming your gene IDs are in a text file, one per line
-gene_list_file = "/g/korbel/olisov/hackathon/del_genes.txt"
+gene_list_file = "../files/del_genes.txt"
 with open(gene_list_file) as f:
     gene_list = [line.strip() for line in f]
 
@@ -17,7 +17,7 @@ genes_df = pd.DataFrame(gene_list, columns=['gene_id'])
 enrichment_results = gp.enrichr(gene_list=genes_df['gene_id'].tolist(),
                                 gene_sets='KEGG_2019_Human',
                                 organism='Human',  # specify the organism, it can be 'Human', 'Mouse', etc.
-                                outdir='/g/korbel/olisov/hackathon/enrichment_results',  # the output directory
+                                outdir='../files/enrichment_results',
                                 cutoff=0.05)
 
 # Extract the results DataFrame
@@ -39,5 +39,5 @@ sns.barplot(
 plt.title('Top Enriched Terms')
 plt.xlabel('Number of Genes')
 plt.legend(title='Adjusted P-value')
-plt.savefig(f'/g/korbel/olisov/hackathon/GSEA.png', bbox_inches='tight', dpi=300)
+plt.savefig('../files/GSEA.png', bbox_inches='tight', dpi=300)
 plt.show()

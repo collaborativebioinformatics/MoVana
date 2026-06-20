@@ -46,10 +46,10 @@ plt.savefig('ICGC_VAF_distribution.png', bbox_inches='tight', dpi=300)
 plt.show()
 
 # Read the VCF file and add AF values
-vcf_data = pd.read_csv('{vcf_file}', sep='\t', comment='#', header=None)
+vcf_data = pd.read_csv('~{vcf_file}', sep='\t', comment='#', header=None)
 
 # Find the header line and set the column names
-with open('{vcf_file}', 'r') as f:
+with open('~{vcf_file}', 'r') as f:
     for line in f:
         if line.startswith('#CHROM'):
             headers = line.strip().split('\t')
@@ -66,7 +66,7 @@ vcf_data['INFO'] = vcf_data['INFO'] + ';AF=' + af_values.astype(str)
 # Write the updated VCF to a new file
 output_vcf_path = 'icgc_with_af.vcf'
 with open(output_vcf_path, 'w') as out_file:
-    with open('{vcf_file}', 'r') as in_file:
+    with open('~{vcf_file}', 'r') as in_file:
         for line in in_file:
             if line.startswith('##'):
                 out_file.write(line)
@@ -79,9 +79,11 @@ print(f"VCF file with AF values saved to: {output_vcf_path}")
 
 # Add SVLEN for clinical_SVs
 def add_svlen_to_info(info, pos):
-    info_dict = dict(item.split("=") for item in info.split(";") if "=" in item)
+    info_dict = dict(item.split("=", 1) for item in info.split(";") if "=" in item)
     end = int(info_dict['END'])
     svlen = end - int(pos)
+    if info_dict.get('SVTYPE') == 'DEL':
+        svlen = -svlen
     info_dict['SVLEN'] = str(svlen)
     new_info = ";".join([f"{key}={value}" for key, value in info_dict.items()])
     return new_info
@@ -102,7 +104,7 @@ with open(input_vcf, 'r') as infile, open(output_vcf, 'w') as outfile:
         sample = columns[9]
         updated_info = add_svlen_to_info(info, pos)
         columns[7] = updated_info
-        if format_col == "GT":
+        if format_col.split(':')[0] == "GT":
             columns[9] = "0/1"
         outfile.write('\t'.join(columns) + '\n')
 
@@ -128,7 +130,7 @@ task Step2_FilterVCF {
   input {
     String af
     File input_file
-    File output_file
+    String output_file
   }
 
   command <<<
@@ -151,15 +153,15 @@ task Step2_FilterVCF {
 task Step3_RandomSampling {
   input {
     File input_vcf
-    File output_vcf_sampled
+    String output_vcf_sampled
   }
 
   command <<<
     python3 <<CODE
 import random
 
-input_vcf = '{input_vcf}'
-output_vcf_sampled = '{output_vcf_sampled}'
+input_vcf = '~{input_vcf}'
+output_vcf_sampled = '~{output_vcf_sampled}'
 
 data_lines = []
 
@@ -197,12 +199,17 @@ CODE
 task Step4_IntersectSV {
   input {
     File input_file
-    File output_file
+    String output_file
     File bed_file
   }
 
   command <<<
-    bedtools intersect -a "${input_file}" -b "${bed_file}" -wo > "${output_file}"
+    BED="~{bed_file}"
+    if [[ "$BED" == *.tar.bz2 ]]; then
+        tar -xjf "$BED" .
+        BED=$(tar -tjf "~{bed_file}" | head -1)
+    fi
+    bedtools intersect -a "~{input_file}" -b "$BED" -wo > "~{output_file}"
   >>>
 
   output {
@@ -222,7 +229,7 @@ task Step5_GetGenesForGSEA {
   input {
     String sv_type
     File input_file
-    File output_file
+    String output_file
   }
 
   command <<<
@@ -290,7 +297,7 @@ import matplotlib.pyplot as plt
 
 # Load your list of Ensembl gene IDs that were produced by a bash script
 # Assuming your gene IDs are in a text file, one per line
-gene_list_file = '{gene_list_file}'
+gene_list_file = '~{gene_list_file}'
 with open(gene_list_file) as f:
     gene_list = [line.strip() for line in f]
 
@@ -301,10 +308,8 @@ genes_df = pd.DataFrame(gene_list, columns=['gene_id'])
 # You can choose the library you want to use for enrichment, e.g., "KEGG_2019_Human"
 enrichment_results = gp.enrichr(gene_list=genes_df['gene_id'].tolist(),
                                 gene_sets='KEGG_2019_Human',
-                                organism='Human',  # specify the organism, it can be 'Human', 'Mouse'
-, etc.
-                                outdir='/g/korbel/olisov/hackathon/enrichment_results',  # the output
- directory
+                                organism='Human',
+                                outdir='enrichment_results',
                                 cutoff=0.05)
 
 # Extract the results DataFrame

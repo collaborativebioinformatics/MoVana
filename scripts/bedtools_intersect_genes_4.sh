@@ -33,5 +33,13 @@ if [[ -z "$INPUT_FILE" || -z "$OUTPUT_FILE" ]]; then
   usage
 fi
 
+# Decompress BED file if it is a compressed tarball
+ACTUAL_BED="$BED_FILE"
+if [[ "$BED_FILE" == *.tar.bz2 ]]; then
+    TMPDIR=$(mktemp -d)
+    tar -xjf "$BED_FILE" -C "$TMPDIR"
+    ACTUAL_BED="$TMPDIR/$(tar -tjf "$BED_FILE" | head -1)"
+fi
+
 # Run bedtools intersect with the user-specified or default options
-bedtools intersect -a "$INPUT_FILE" -b "$BED_FILE" -wo > "$OUTPUT_FILE"
+bedtools intersect -a "$INPUT_FILE" -b "$ACTUAL_BED" -wo > "$OUTPUT_FILE"
