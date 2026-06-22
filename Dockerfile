@@ -20,7 +20,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     rm -rf /var/lib/apt/lists/*
 
 # uv
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
+COPY --from=ghcr.io/astral-sh/uv:0.9.7 /uv /uvx /usr/local/bin/
 
 RUN uv python install 3.12
 COPY requirements.txt /tmp/requirements.txt
@@ -32,8 +32,9 @@ WORKDIR $APP_HOME
 
 # cromwell
 ARG CROMWELL_VERSION=92
-ARG CROMWELL_SHA256=d90e46f60f430ff627222c97b950c43f1ededc992619e0aeceaa334690d06073
-RUN wget -q -O $APP_HOME/cromwell.jar https://github.com/broadinstitute/cromwell/releases/download/92/cromwell-92.jar
+ARG CROMWELL_SHA256=e0e3a050d4124e81369a79059e5774142b2f06bd89df4a0b035f559db85cedf5
+RUN wget -q -O $APP_HOME/cromwell.jar https://github.com/broadinstitute/cromwell/releases/download/${CROMWELL_VERSION}/cromwell-${CROMWELL_VERSION}.jar && \
+    echo "${CROMWELL_SHA256}  $APP_HOME/cromwell.jar" | sha256sum -c -
 
 # Run as non-root - movana
 RUN useradd --create-home --shell /bin/bash movana && \
