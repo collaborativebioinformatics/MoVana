@@ -14,9 +14,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         zlib1g-dev \
         wget \
         ca-certificates \
-	bedtools \
+        bedtools \
         bcftools \
-        openjdk-17-jre-headless&& \
+        openjdk-17-jre-headless && \
     rm -rf /var/lib/apt/lists/*
 
 # uv
@@ -33,8 +33,8 @@ WORKDIR $APP_HOME
 # cromwell
 ARG CROMWELL_VERSION=92
 ARG CROMWELL_SHA256=e0e3a050d4124e81369a79059e5774142b2f06bd89df4a0b035f559db85cedf5
-RUN wget -q -O $APP_HOME/cromwell.jar https://github.com/broadinstitute/cromwell/releases/download/${CROMWELL_VERSION}/cromwell-${CROMWELL_VERSION}.jar && \
-    echo "${CROMWELL_SHA256}  $APP_HOME/cromwell.jar" | sha256sum -c -
+RUN wget -q -O $APP_HOME/cromwell-${CROMWELL_VERSION}.jar https://github.com/broadinstitute/cromwell/releases/download/${CROMWELL_VERSION}/cromwell-${CROMWELL_VERSION}.jar && \
+    echo "${CROMWELL_SHA256}  $APP_HOME/cromwell-${CROMWELL_VERSION}.jar" | sha256sum -c -
 
 # Run as non-root - movana
 RUN useradd --create-home --shell /bin/bash movana && \
