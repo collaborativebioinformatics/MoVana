@@ -7,6 +7,7 @@ task Step1_GenerateSimulatedDistribution {
   }
 
   command <<<
+    pip install --quiet --no-cache-dir numpy pandas matplotlib
     python3 <<CODE
 import numpy as np
 import pandas as pd
@@ -71,6 +72,8 @@ with open(output_vcf_path, 'w') as out_file:
             if line.startswith('##'):
                 out_file.write(line)
             elif line.startswith('#CHROM'):
+                out_file.write('##INFO=<ID=AF,Number=A,Type=Float,Description="Allele Frequency">\n')
+                out_file.write('##INFO=<ID=SVLEN,Number=1,Type=Integer,Description="Difference in length between REF and ALT alleles">\n')
                 out_file.write(line)
                 break
     vcf_data.to_csv(out_file, sep='\t', index=False, header=False)
@@ -118,7 +121,7 @@ CODE
   }
 
   runtime {
-    docker: "python:3.8"
+    docker: "python:3.12-slim"
     cpu : 1
     memory : "4 GiB"
     maxRetries : 1
@@ -142,7 +145,7 @@ task Step2_FilterVCF {
   }
 
   runtime {
-    docker: "bcftools:latest"
+    docker: "quay.io/biocontainers/bcftools:1.21--h8b25389_0"
     cpu : 1
     memory : "4 GiB"
     maxRetries : 1
@@ -188,7 +191,7 @@ CODE
   }
 
   runtime {
-    docker: "python:3.8"
+    docker: "python:3.12-slim"
     cpu : 1
     memory : "4 GiB"
     maxRetries : 1
@@ -206,7 +209,7 @@ task Step4_IntersectSV {
   command <<<
     BED="~{bed_file}"
     if [[ "$BED" == *.tar.bz2 ]]; then
-        tar -xjf "$BED" .
+        tar -xjf "$BED"
         BED=$(tar -tjf "~{bed_file}" | head -1)
     fi
     bedtools intersect -a "~{input_file}" -b "$BED" -wo > "~{output_file}"
@@ -217,7 +220,7 @@ task Step4_IntersectSV {
   }
 
   runtime {
-    docker: "biocontainers/bedtools:latest"
+    docker: "quay.io/biocontainers/bedtools:2.31.1--hf5e1c6e_2"
     cpu : 1
     memory : "4 GiB"
     maxRetries : 1
@@ -233,7 +236,7 @@ task Step5_GetGenesForGSEA {
   }
 
   command <<<
-    bash <<SCRIPT
+    bash <<'SCRIPT'
 #!/bin/bash
 # Function to print usage
 usage() {
@@ -258,12 +261,9 @@ fi
 
 # Extract unique gene IDs based on SV type and remove .x suffix
 if [ "${sv_type}" == "all" ]; then
-  awk -F'\t' '{for (i=1; i<=NF; i++) if ($i ~ /gene_name /) {match($i, /gene_name "([^"]+)"/, arr); p
-rint arr[1]}}' "${input_file}" | sed 's/\.[0-9]\+$//' | sort | uniq > "${output_file}"
+  awk -F'\t' '{for (i=1; i<=NF; i++) if ($i ~ /gene_name /) {match($i, /gene_name "[^"]+"/); s=substr($i,RSTART,RLENGTH); gsub(/gene_name "|"/,"",s); print s}}' "${input_file}" | sed 's/\.[0-9]\+$//' | sort | uniq > "${output_file}"
 else
-  grep "SVTYPE=${sv_type}" "${input_file}" | awk -F'\t' '{for (i=1; i<=NF; i++) if ($i ~ /gene_name /
-) {match($i, /gene_name "([^"]+)"/, arr); print arr[1]}}' | sed 's/\.[0-9]\+$//' | sort | uniq > "${o
-utput_file}"
+  grep "SVTYPE=${sv_type}" "${input_file}" | awk -F'\t' '{for (i=1; i<=NF; i++) if ($i ~ /gene_name /) {match($i, /gene_name "[^"]+"/); s=substr($i,RSTART,RLENGTH); gsub(/gene_name "|"/,"",s); print s}}' | sed 's/\.[0-9]\+$//' | sort | uniq > "${output_file}"
 fi
 # Notify the user
 echo "Unique gene names for SV type ${sv_type} have been written to ${output_file}"
@@ -275,7 +275,7 @@ SCRIPT
   }
 
   runtime {
-    docker: "bash:latest"
+    docker: "debian:stable-slim"
     cpu : 1
     memory : "4 GiB"
     maxRetries : 1
@@ -289,6 +289,7 @@ task Step6_PerformGSEA {
   }
 
   command <<<
+    pip install --quiet --no-cache-dir gseapy pandas seaborn matplotlib
     python3 <<CODE
 import gseapy as gp
 import pandas as pd
@@ -308,9 +309,9 @@ genes_df = pd.DataFrame(gene_list, columns=['gene_id'])
 # You can choose the library you want to use for enrichment, e.g., "KEGG_2019_Human"
 enrichment_results = gp.enrichr(gene_list=genes_df['gene_id'].tolist(),
                                 gene_sets='KEGG_2019_Human',
-                                organism='Human',
+                                organism='human',
                                 outdir='enrichment_results',
-                                cutoff=0.05)
+                                cutoff=1.0)
 
 # Extract the results DataFrame
 results_df = enrichment_results.results
@@ -341,7 +342,7 @@ CODE
   }
 
   runtime {
-    docker: "python:3.8"
+    docker: "python:3.12-slim"
   }
 }
 

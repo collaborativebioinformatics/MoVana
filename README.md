@@ -17,7 +17,7 @@ Next known SVs breakpoints and gene coordinates are used to find overlaps with b
 
 ## Installation
 
-### make sure you have python and bash is installed
+### make sure you have `python` and `bash` is installed
     pip install numpy pandas matplotlib
 
 ### docker 

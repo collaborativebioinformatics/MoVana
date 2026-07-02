@@ -18,7 +18,7 @@ enrichment_results = gp.enrichr(gene_list=genes_df['gene_id'].tolist(),
                                 gene_sets='KEGG_2019_Human',
                                 organism='Human',  # specify the organism, it can be 'Human', 'Mouse', etc.
                                 outdir='../files/enrichment_results',
-                                cutoff=0.05)
+                                cutoff=1.0)
 
 # Extract the results DataFrame
 results_df = enrichment_results.results
