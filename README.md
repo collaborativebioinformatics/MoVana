@@ -21,8 +21,8 @@ Next known SVs breakpoints and gene coordinates are used to find overlaps with b
     pip install numpy pandas matplotlib
 
 ### docker 
-    docker build -t dockerfile .
-    docker run dockerfile
+    docker build -t .
+    docker run Dockerfile
 
 ## Usage
 ### cromwell
