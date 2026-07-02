@@ -134,7 +134,7 @@ task Step2_FilterVCF {
   }
 
   command <<<
-    bcftools view -i "INFO/AF<${af}" "${input_file}" -o "${output_file}"
+    bcftools view -i "INFO/AF<~{af}" "~{input_file}" -o "~{output_file}"
   >>>
 
   output {
@@ -242,9 +242,9 @@ usage() {
 }
 
 # Initialize variables
-sv_type="${sv_type}"
-input_file="${input_file}"
-output_file="${output_file}"
+sv_type="~{sv_type}"
+input_file="~{input_file}"
+output_file="~{output_file}"
 
 # Validate the sv_type
 if [[ "${sv_type}" != "DEL" && "${sv_type}" != "DUP" && "${sv_type}" != "all" ]]; then
